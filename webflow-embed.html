@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Window Cleaning Calculator</title>
+    <style>
+        /* Reset and base styles */
+        .wc-calculator * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .wc-calculator {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .wc-header {
+            background: linear-gradient(135deg, #3695bb 0%, #2a7a9a 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .wc-header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .wc-header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .wc-form-container {
+            padding: 40px;
+        }
+
+        .wc-form-group {
+            margin-bottom: 25px;
+        }
+
+        .wc-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .wc-input, .wc-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .wc-input:focus, .wc-select:focus {
+            outline: none;
+            border-color: #3695bb;
+            background: white;
+        }
+
+        .wc-checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .wc-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wc-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: #3695bb;
+        }
+
+        .wc-btn {
+            background: linear-gradient(135deg, #3695bb 0%, #2a7a9a 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .wc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(54, 149, 187, 0.3);
+        }
+
+        .wc-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .wc-price-display {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            margin: 25px 0;
+            display: none;
+        }
+
+        .wc-price-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .wc-price-description {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .wc-loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            display: none;
+        }
+
+        .wc-success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+            text-align: center;
+        }
+
+        .wc-error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .wc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .wc-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .wc-calculator {
+                margin: 10px;
+            }
+            
+            .wc-form-container {
+                padding: 20px;
+            }
+            
+            .wc-header {
+                padding: 20px;
+            }
+            
+            .wc-header h1 {
+                font-size: 1.8em;
+            }
+
+            .wc-grid, .wc-grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wc-calculator">
+        <div class="wc-header">
+            <h1>Window Cleaning Calculator</h1>
+            <p>Get an instant quote for professional window cleaning services</p>
+        </div>
+        
+        <div class="wc-form-container">
+            <form id="wcCalculatorForm">
+                <div class="wc-form-group">
+                    <label class="wc-label" for="wcAddress">Property Address *</label>
+                    <input type="text" id="wcAddress" name="address" class="wc-input" required 
+                           placeholder="Enter your complete address">
+                </div>
+
+                <div class="wc-grid">
+                    <div class="wc-form-group">
+                        <label class="wc-label" for="wcServiceType">Service Type *</label>
+                        <select id="wcServiceType" name="serviceType" class="wc-select" required>
+                            <option value="">Select service type</option>
+                            <option value="interior-exterior">Interior & Exterior Cleaning</option>
+                            <option value="exterior-only">Exterior Only Cleaning</option>
+                        </select>
+                    </div>
+
+                    <div class="wc-form-group">
+                        <label class="wc-label" for="wcStories">Number of Stories *</label>
+                        <select id="wcStories" name="stories" class="wc-select" required>
+                            <option value="">Select number of stories</option>
+                            <option value="1">1 Story</option>
+                            <option value="2">2 Stories</option>
+                            <option value="3">3 Stories</option>
+                            <option value="4">4 or More Stories</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="wc-form-group">
+                    <label class="wc-label">Additional Services</label>
+                    <div class="wc-checkbox-group">
+                        <div class="wc-checkbox-item">
+                            <input type="checkbox" id="wcScreenCleaning" name="addons" value="screen" class="wc-checkbox">
+                            <label for="wcScreenCleaning">Screen Cleaning (+$0.05/sq ft)</label>
+                        </div>
+                        <div class="wc-checkbox-item">
+                            <input type="checkbox" id="wcTrackCleaning" name="addons" value="track" class="wc-checkbox">
+                            <label for="wcTrackCleaning">Window Track Cleaning (+$0.03/sq ft)</label>
+                        </div>
+                        <div class="wc-checkbox-item">
+                            <input type="checkbox" id="wcSkylights" name="skylights" class="wc-checkbox">
+                            <label for="wcSkylights">My home includes skylights or hard-to-reach glass</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wc-grid-3">
+                    <div class="wc-form-group">
+                        <label class="wc-label" for="wcCustomerName">Your Name *</label>
+                        <input type="text" id="wcCustomerName" name="customerName" class="wc-input" required>
+                    </div>
+
+                    <div class="wc-form-group">
+                        <label class="wc-label" for="wcCustomerEmail">Email Address *</label>
+                        <input type="email" id="wcCustomerEmail" name="customerEmail" class="wc-input" required>
+                    </div>
+
+                    <div class="wc-form-group">
+                        <label class="wc-label" for="wcCustomerPhone">Phone Number *</label>
+                        <input type="tel" id="wcCustomerPhone" name="customerPhone" class="wc-input" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="wc-btn" id="wcCalculateBtn">Get My Quote</button>
+            </form>
+
+            <div class="wc-loading" id="wcLoading">
+                <p>Calculating your quote...</p>
+            </div>
+
+            <div class="wc-error-message" id="wcErrorMessage"></div>
+
+            <div class="wc-price-display" id="wcPriceDisplay">
+                <div class="wc-price-amount" id="wcPriceAmount">$0</div>
+                <div class="wc-price-description">Professional Window Cleaning Service</div>
+                <button type="button" class="wc-btn" id="wcAcceptBtn">Accept Quote & Schedule Service</button>
+            </div>
+
+            <div class="wc-success-message" id="wcSuccessMessage">
+                <h3>Quote Accepted!</h3>
+                <p>Thank you for choosing Westlake Window Cleaners. Someone from our team will contact you within 24 hours to schedule your service.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - UPDATE THESE URLs TO YOUR DEPLOYED API
+        const API_BASE_URL = 'https://your-deployed-app.vercel.app/api'; // Replace with your actual API URL
+        
+        const PRICING = {
+            'interior-exterior': {
+                baseRate: 0.14,
+                multiStoryAdd: 0.02,
+                minimum: 250
+            },
+            'exterior-only': {
+                baseRate: 0.08,
+                multiStoryAdd: 0.02,
+                minimum: 150
+            },
+            addons: {
+                screen: 0.05,
+                track: 0.03
+            }
+        };
+
+        let currentQuote = null;
+
+        document.getElementById('wcCalculatorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await calculateQuote();
+        });
+
+        document.getElementById('wcAcceptBtn').addEventListener('click', async function() {
+            await acceptQuote();
+        });
+
+        async function calculateQuote() {
+            const loading = document.getElementById('wcLoading');
+            const errorMessage = document.getElementById('wcErrorMessage');
+            const priceDisplay = document.getElementById('wcPriceDisplay');
+            
+            // Reset displays
+            loading.style.display = 'block';
+            errorMessage.style.display = 'none';
+            priceDisplay.style.display = 'none';
+
+            try {
+                const formData = new FormData(document.getElementById('wcCalculatorForm'));
+                const address = formData.get('address');
+                const serviceType = formData.get('serviceType');
+                const stories = parseInt(formData.get('stories'));
+                const addons = formData.getAll('addons');
+
+                // For Webflow embed, we'll use a simplified calculation
+                // You can enhance this to call your actual API endpoints
+                
+                // Estimate square footage (simplified)
+                const estimatedSquareFootage = 2000; // Default estimate
+                
+                // Calculate pricing
+                const quote = calculatePricing(estimatedSquareFootage, serviceType, stories, addons, 5);
+                
+                if (quote.isNotSuitable) {
+                    throw new Error(quote.message);
+                }
+
+                // Store current quote
+                currentQuote = {
+                    ...quote,
+                    address,
+                    serviceType,
+                    stories,
+                    addons,
+                    squareFootage: estimatedSquareFootage,
+                    customerName: formData.get('customerName'),
+                    customerEmail: formData.get('customerEmail'),
+                    customerPhone: formData.get('customerPhone'),
+                    hasSkylights: formData.get('skylights') === 'on'
+                };
+
+                // Display results
+                document.getElementById('wcPriceAmount').textContent = `$${quote.finalPrice}`;
+                priceDisplay.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error calculating quote:', error);
+                errorMessage.textContent = error.message || 'Unable to calculate quote. Please try again.';
+                errorMessage.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        async function acceptQuote() {
+            if (!currentQuote) return;
+
+            const acceptBtn = document.getElementById('wcAcceptBtn');
+            const successMessage = document.getElementById('wcSuccessMessage');
+            const priceDisplay = document.getElementById('wcPriceDisplay');
+
+            acceptBtn.disabled = true;
+            acceptBtn.textContent = 'Sending...';
+
+            try {
+                // Send to your API endpoint
+                const response = await fetch(`${API_BASE_URL}/send-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ quoteData: currentQuote }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send quote');
+                }
+                
+                priceDisplay.style.display = 'none';
+                successMessage.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error sending quote:', error);
+                alert('There was an error sending your quote. Please call us directly.');
+                acceptBtn.disabled = false;
+                acceptBtn.textContent = 'Accept Quote & Schedule Service';
+            }
+        }
+
+        function calculatePricing(squareFootage, serviceType, stories, addons, distance) {
+            const pricing = PRICING[serviceType];
+            let baseRate = pricing.baseRate;
+            let totalPrice = 0;
+
+            // Story calculation
+            if (stories === 2) {
+                baseRate += 0.02;
+                totalPrice = squareFootage * baseRate;
+            } else if (stories === 3) {
+                totalPrice = 300 + squareFootage * 0.06;
+            } else if (stories >= 4) {
+                return {
+                    isNotSuitable: true,
+                    message: "For properties with 4 or more stories, please contact us directly for a custom quote."
+                };
+            } else {
+                totalPrice = squareFootage * baseRate;
+            }
+
+            // Add addon costs
+            let addonCosts = 0;
+            addons.forEach(addon => {
+                addonCosts += squareFootage * PRICING.addons[addon];
+            });
+            totalPrice += addonCosts;
+
+            // Apply minimum
+            const finalPrice = Math.max(totalPrice, pricing.minimum);
+
+            return {
+                squareFootage,
+                baseRate,
+                basePrice: stories === 3 ? 300 + squareFootage * 0.06 : squareFootage * baseRate,
+                addonCosts,
+                subtotal: totalPrice,
+                minimum: pricing.minimum,
+                finalPrice: Math.round(finalPrice)
+            };
+        }
+    </script>
+</body>
+</html>

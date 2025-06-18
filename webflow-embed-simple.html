@@ -1,0 +1,159 @@
+<!-- SIMPLE WEBFLOW EMBED VERSION -->
+<!-- Copy this code and paste it into a Webflow Embed element -->
+
+<div class="wc-calculator">
+    <div class="wc-header">
+        <h1>Window Cleaning Calculator</h1>
+        <p>Get an instant quote for professional window cleaning services</p>
+    </div>
+    
+    <div class="wc-form-container">
+        <form id="wcCalculatorForm">
+            <div class="wc-form-group">
+                <label class="wc-label" for="wcAddress">Property Address *</label>
+                <input type="text" id="wcAddress" name="address" class="wc-input" required 
+                       placeholder="Enter your complete address">
+            </div>
+
+            <div class="wc-grid">
+                <div class="wc-form-group">
+                    <label class="wc-label" for="wcServiceType">Service Type *</label>
+                    <select id="wcServiceType" name="serviceType" class="wc-select" required>
+                        <option value="">Select service type</option>
+                        <option value="interior-exterior">Interior & Exterior Cleaning</option>
+                        <option value="exterior-only">Exterior Only Cleaning</option>
+                    </select>
+                </div>
+
+                <div class="wc-form-group">
+                    <label class="wc-label" for="wcStories">Number of Stories *</label>
+                    <select id="wcStories" name="stories" class="wc-select" required>
+                        <option value="">Select number of stories</option>
+                        <option value="1">1 Story</option>
+                        <option value="2">2 Stories</option>
+                        <option value="3">3 Stories</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="wc-grid-3">
+                <div class="wc-form-group">
+                    <label class="wc-label" for="wcCustomerName">Your Name *</label>
+                    <input type="text" id="wcCustomerName" name="customerName" class="wc-input" required>
+                </div>
+
+                <div class="wc-form-group">
+                    <label class="wc-label" for="wcCustomerEmail">Email Address *</label>
+                    <input type="email" id="wcCustomerEmail" name="customerEmail" class="wc-input" required>
+                </div>
+
+                <div class="wc-form-group">
+                    <label class="wc-label" for="wcCustomerPhone">Phone Number *</label>
+                    <input type="tel" id="wcCustomerPhone" name="customerPhone" class="wc-input" required>
+                </div>
+            </div>
+
+            <button type="submit" class="wc-btn" id="wcCalculateBtn">Get My Quote</button>
+        </form>
+
+        <div class="wc-price-display" id="wcPriceDisplay" style="display: none;">
+            <div class="wc-price-amount" id="wcPriceAmount">$0</div>
+            <div class="wc-price-description">Professional Window Cleaning Service</div>
+            <button type="button" class="wc-btn" id="wcAcceptBtn">Accept Quote & Schedule Service</button>
+        </div>
+
+        <div class="wc-success-message" id="wcSuccessMessage" style="display: none;">
+            <h3>Quote Accepted!</h3>
+            <p>Thank you! Someone from our team will contact you within 24 hours.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+.wc-calculator * { margin: 0; padding: 0; box-sizing: border-box; }
+.wc-calculator { font-family: 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+.wc-header { background: linear-gradient(135deg, #3695bb 0%, #2a7a9a 100%); color: white; padding: 30px; text-align: center; }
+.wc-header h1 { font-size: 2.2em; margin-bottom: 10px; font-weight: 300; }
+.wc-header p { opacity: 0.9; font-size: 1.1em; }
+.wc-form-container { padding: 40px; }
+.wc-form-group { margin-bottom: 25px; }
+.wc-label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 1.1em; }
+.wc-input, .wc-select { width: 100%; padding: 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 16px; background: #f8f9fa; }
+.wc-input:focus, .wc-select:focus { outline: none; border-color: #3695bb; background: white; }
+.wc-btn { background: linear-gradient(135deg, #3695bb 0%, #2a7a9a 100%); color: white; border: none; padding: 18px 40px; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; width: 100%; margin-top: 20px; }
+.wc-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(54, 149, 187, 0.3); }
+.wc-price-display { background: #f8f9fa; border: 2px solid #e1e5e9; border-radius: 8px; padding: 25px; text-align: center; margin: 25px 0; }
+.wc-price-amount { font-size: 2.5em; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
+.wc-price-description { color: #7f8c8d; font-size: 1.1em; }
+.wc-success-message { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
+.wc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.wc-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+@media (max-width: 768px) { .wc-grid, .wc-grid-3 { grid-template-columns: 1fr; } .wc-form-container { padding: 20px; } .wc-header { padding: 20px; } .wc-header h1 { font-size: 1.8em; } }
+</style>
+
+<script>
+const API_BASE_URL = 'https://your-app.vercel.app/api'; // UPDATE THIS!
+
+const PRICING = {
+    'interior-exterior': { baseRate: 0.14, minimum: 250 },
+    'exterior-only': { baseRate: 0.08, minimum: 150 }
+};
+
+let currentQuote = null;
+
+document.getElementById('wcCalculatorForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const serviceType = formData.get('serviceType');
+    const stories = parseInt(formData.get('stories'));
+    
+    // Simple calculation
+    const squareFootage = 2000; // Default estimate
+    let baseRate = PRICING[serviceType].baseRate;
+    if (stories === 2) baseRate += 0.02;
+    if (stories === 3) baseRate = 0.20; // Special rate for 3 stories
+    
+    const totalPrice = Math.max(squareFootage * baseRate, PRICING[serviceType].minimum);
+    
+    currentQuote = {
+        finalPrice: Math.round(totalPrice),
+        customerName: formData.get('customerName'),
+        customerEmail: formData.get('customerEmail'),
+        customerPhone: formData.get('customerPhone'),
+        address: formData.get('address'),
+        serviceType: serviceType,
+        stories: stories,
+        squareFootage: squareFootage
+    };
+    
+    document.getElementById('wcPriceAmount').textContent = `$${currentQuote.finalPrice}`;
+    document.getElementById('wcPriceDisplay').style.display = 'block';
+});
+
+document.getElementById('wcAcceptBtn').addEventListener('click', async function() {
+    if (!currentQuote) return;
+    
+    this.disabled = true;
+    this.textContent = 'Sending...';
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/send-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quoteData: currentQuote })
+        });
+        
+        if (response.ok) {
+            document.getElementById('wcPriceDisplay').style.display = 'none';
+            document.getElementById('wcSuccessMessage').style.display = 'block';
+        } else {
+            throw new Error('Failed to send');
+        }
+    } catch (error) {
+        alert('Error sending quote. Please call us directly.');
+        this.disabled = false;
+        this.textContent = 'Accept Quote & Schedule Service';
+    }
+});
+</script>

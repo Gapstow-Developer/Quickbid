@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Window Cleaning Calculator</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3695bb 0%, #2a7a9a 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .help-text {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"], select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, select:focus {
+            outline: none;
+            border-color: #3695bb;
+            background: white;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #3695bb;
+        }
+
+        .checkbox-item label {
+            margin-bottom: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3695bb 0%, #2a7a9a 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(54, 149, 187, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #3695bb;
+            color: #3695bb;
+        }
+
+        .btn-outline:hover {
+            background: rgba(54, 149, 187, 0.1);
+        }
+
+        .price-display {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            margin: 25px 0;
+            display: none;
+        }
+
+        .price-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .price-description {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+            text-align: center;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-container {
+                margin: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .grid, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="header">
+            <h1>Window Cleaning Calculator</h1>
+            <p>Get an instant quote for professional window cleaning services</p>
+        </div>
+        
+        <div class="form-container">
+            <form id="calculatorForm">
+                <div class="form-group">
+                    <label for="address">Property Address *</label>
+                    <input type="text" id="address" name="address" required 
+                           placeholder="Enter your complete address">
+                </div>
+
+                <div id="manualSqft" class="form-group" style="display: none;">
+                    <label for="squareFootage">Home Square Footage *</label>
+                    <input type="text" id="squareFootage" name="squareFootage" 
+                           placeholder="e.g. 2,000">
+                    <p class="help-text">Please enter the approximate square footage of your home</p>
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="serviceType">Service Type *</label>
+                        <select id="serviceType" name="serviceType" required>
+                            <option value="">Select service type</option>
+                            <option value="interior-exterior">Interior & Exterior Cleaning</option>
+                            <option value="exterior-only">Exterior Only Cleaning</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stories">Number of Stories *</label>
+                        <select id="stories" name="stories" required>
+                            <option value="">Select number of stories</option>
+                            <option value="1">1 Story</option>
+                            <option value="2">2 Stories</option>
+                            <option value="3">3 Stories</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Additional Services</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="screenCleaning" name="addons" value="screen">
+                            <label for="screenCleaning">Screen Cleaning (+$0.05/sq ft)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="trackCleaning" name="addons" value="track">
+                            <label for="trackCleaning">Window Track Cleaning (+$0.03/sq ft)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="skylights" name="skylights">
+                            <label for="skylights">My home includes skylights or hard-to-reach glass</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label for="customerName">Your Name *</label>
+                        <input type="text" id="customerName" name="customerName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customerEmail">Email Address *</label>
+                        <input type="email" id="customerEmail" name="customerEmail" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customerPhone">Phone Number *</label>
+                        <input type="tel" id="customerPhone" name="customerPhone" required>
+                    </div>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+
+                <button type="submit" class="btn" id="calculateBtn">Get My Quote</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <p>Calculating your quote...</p>
+            </div>
+
+            <div class="price-display" id="priceDisplay">
+                <div class="price-amount" id="priceAmount">$0</div>
+                <div class="price-description">Professional Window Cleaning Service</div>
+                <button type="button" class="btn" id="acceptBtn">Accept Quote & Schedule Service</button>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <h3>Quote Accepted!</h3>
+                <p>Thank you for choosing Westlake Window Cleaners. Someone from our team will contact you within 24 hours to schedule your service.</p>
+                <button type="button" class="btn btn-outline" id="resetBtn" style="margin-top: 20px;">Submit Another Quote</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - UPDATE THIS URL to your deployed API
+        const API_BASE_URL = 'https://your-app.vercel.app/api'; 
+
+        // Pricing structure
+        const PRICING = {
+            'interior-exterior': {
+                baseRate: 0.14,
+                multiStoryAdd: 0.02,
+                minimum: 250
+            },
+            'exterior-only': {
+                baseRate: 0.08,
+                multiStoryAdd: 0.02,
+                minimum: 150
+            },
+            addons: {
+                screen: 0.05,
+                track: 0.03
+            }
+        };
+
+        // Global variables
+        let currentQuote = null;
+        let autocomplete = null;
+
+        // Initialize Google Maps Autocomplete
+        function initAutocomplete() {
+            try {
+                const script = document.createElement('script');
+                script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAPgad6Y-v0_gOf6IbTplAIniz34cUSHc0&libraries=places&callback=setupAutocomplete';
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+            } catch (error) {
+                console.error('Error loading Google Maps API:', error);
+                document.getElementById('manualSqft').style.display = 'block';
+            }
+        }
+
+        // Setup autocomplete after Google Maps loads
+        window.setupAutocomplete = function() {
+            try {
+                const addressInput = document.getElementById('address');
+                autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                    componentRestrictions: { country: 'us' },
+                    fields: ['address_components', 'formatted_address', 'geometry'],
+                    types: ['address']
+                });
+                
+                autocomplete.addListener('place_changed', function() {
+                    const place = autocomplete.getPlace();
+                    if (place && place.formatted_address) {
+                        addressInput.value = place.formatted_address;
+                        document.getElementById('manualSqft').style.display = 'block';
+                    }
+                });
+                
+                console.log('Google Maps Autocomplete initialized successfully');
+            } catch (error) {
+                console.error('Error initializing Google Maps Autocomplete:', error);
+                document.getElementById('manualSqft').style.display = 'block';
+            }
+        };
+
+        // Calculate pricing
+        function calculatePricing(squareFootage, serviceType, stories, addons) {
+            try {
+                const pricing = PRICING[serviceType];
+                let baseRate = pricing.baseRate;
+                let totalPrice = 0;
+
+                // Story calculation
+                if (stories === 2) {
+                    baseRate += pricing.multiStoryAdd;
+                    totalPrice = squareFootage * baseRate;
+                } else if (stories === 3) {
+                    // $300 plus $0.06/sq ft for 3 stories
+                    totalPrice = 300 + squareFootage * 0.06;
+                } else if (stories >= 4) {
+                    return {
+                        isNotSuitable: true,
+                        message: "For properties with 4 or more stories, please contact us directly for a custom quote."
+                    };
+                } else {
+                    // 1 story - use base rate
+                    totalPrice = squareFootage * baseRate;
+                }
+
+                // Add addon costs
+                let addonCosts = 0;
+                addons.forEach(addon => {
+                    addonCosts += squareFootage * PRICING.addons[addon];
+                });
+                totalPrice += addonCosts;
+
+                // Apply minimum
+                const finalPrice = Math.max(totalPrice, pricing.minimum);
+
+                return {
+                    squareFootage,
+                    baseRate,
+                    basePrice: stories === 3 ? 300 + squareFootage * 0.06 : squareFootage * baseRate,
+                    addonCosts,
+                    subtotal: totalPrice,
+                    minimum: pricing.minimum,
+                    finalPrice: Math.round(finalPrice)
+                };
+            } catch (error) {
+                console.error('Error calculating price:', error);
+                return {
+                    isNotSuitable: true,
+                    message: "Unable to calculate price. Please try again or contact us directly."
+                };
+            }
+        }
+
+        // Form submission handler
+        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('priceDisplay').style.display = 'none';
+            
+            try {
+                const formData = new FormData(e.target);
+                const address = formData.get('address');
+                const serviceType = formData.get('serviceType');
+                const stories = parseInt(formData.get('stories'));
+                
+                // Get addons
+                const addons = [];
+                if (document.getElementById('screenCleaning').checked) addons.push('screen');
+                if (document.getElementById('trackCleaning').checked) addons.push('track');
+                
+                // Get square footage (either from input or default)
+                let squareFootage = 2000; // Default
+                const manualSqft = document.getElementById('squareFootage').value;
+                if (manualSqft) {
+                    squareFootage = parseInt(manualSqft.replace(/,/g, ''));
+                    if (isNaN(squareFootage) || squareFootage < 500 || squareFootage > 15000) {
+                        throw new Error('Please enter a valid square footage between 500 and 15,000 sq ft');
+                    }
+                }
+                
+                // Calculate price
+                const quote = calculatePricing(squareFootage, serviceType, stories, addons);
+                
+                if (quote.isNotSuitable) {
+                    throw new Error(quote.message);
+                }
+                
+                // Store current quote
+                currentQuote = {
+                    ...quote,
+                    address,
+                    serviceType,
+                    stories,
+                    addons,
+                    customerName: formData.get('customerName'),
+                    customerEmail: formData.get('customerEmail'),
+                    customerPhone: formData.get('customerPhone'),
+                    hasSkylights: document.getElementById('skylights').checked
+                };
+                
+                // Display results
+                document.getElementById('priceAmount').textContent = `$${quote.finalPrice}`;
+                document.getElementById('priceDisplay').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error calculating quote:', error);
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = error.message || 'Unable to calculate quote. Please try again.';
+                errorMessage.style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+
+        // Accept quote button handler
+        document.getElementById('acceptBtn').addEventListener('click', async function() {
+            if (!currentQuote) return;
+            
+            this.disabled = true;
+            this.textContent = 'Sending...';
+            
+            try {
+                // Try to send to API if available
+                if (API_BASE_URL !== 'https://your-app.vercel.app/api') {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/send-email`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ quoteData: currentQuote })
+                        });
+                        
+                        if (!response.ok) {
+                            console.warn('API call failed, but continuing for user experience');
+                        }
+                    } catch (apiError) {
+                        console.warn('API call failed:', apiError);
+                        // Continue anyway for better user experience
+                    }
+                } else {
+                    console.log('API URL not configured, skipping API call');
+                    // Log the quote data to console for debugging
+                    console.log('Quote data:', currentQuote);
+                }
+                
+                // Always show success to user
+                document.getElementById('priceDisplay').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error processing quote:', error);
+                alert('There was an error processing your quote. Please try again or call us directly.');
+                this.disabled = false;
+                this.textContent = 'Accept Quote & Schedule Service';
+            }
+        });
+
+        // Reset button handler
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            // Reset form
+            document.getElementById('calculatorForm').reset();
+            
+            // Hide results
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('priceDisplay').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            // Clear current quote
+            currentQuote = null;
+        });
+
+        // Initialize when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Google Maps Autocomplete
+            initAutocomplete();
+            
+            // Show manual square footage input by default (in case Google Maps fails)
+            setTimeout(function() {
+                if (!autocomplete) {
+                    document.getElementById('manualSqft').style.display = 'block';
+                }
+            }, 1000);
+        });
+
+        // Initialize immediately as well
+        initAutocomplete();
+    </script>
+</body>
+</html>

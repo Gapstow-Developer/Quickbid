@@ -92,6 +92,3 @@ body {
     @apply bg-background text-foreground;
   }
 }
-.space-y-4 {
-  padding-left: 10px;
-}
